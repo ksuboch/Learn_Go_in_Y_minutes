@@ -152,4 +152,16 @@ func learnFlowControl() {
 	// метки
 	goto love
 love:
+
+	learnDefer()
+}
+
+func learnDefer() (ok bool) {
+	// отложенные (deferred) выражения выполняются сразу перед тем, как функция
+	// возвратит значения
+	defer fmt.Println("deferred statements execute in reverse (LIFO) order.")
+	defer fmt.Println("\nThis line is being printed first because")
+	// defer широко используется для закрытия файлов, чтобы закрывающая файл
+	// функция находилась близко к открывающей
+	return true
 }
