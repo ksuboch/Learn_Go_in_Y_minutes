@@ -198,4 +198,17 @@ func learnInterfaces() {
 	// получения их строкового представления
 	fmt.Println(p) // вывод такой-же, как и выше
 	fmt.Println(i) // вывод такой-же, как и выше
+
+	learnVariadicParams("Learn", "learn", "learn again")
+}
+
+// функции могут иметь варьируемое количество параметров
+func learnVariadicParams(myStrings ...interface{}) {
+	// вывести все параметры с помощью итерации
+	for _, param := range myStrings {
+		fmt.Println("param:", param)
+	}
+
+	// передать все варьируемые параметры
+	fmt.Println("params:", fmt.Sprintln(myStrings...))
 }
