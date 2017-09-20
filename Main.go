@@ -154,6 +154,7 @@ func learnFlowControl() {
 love:
 
 	learnDefer()
+	learnInterfaces()
 }
 
 func learnDefer() (ok bool) {
@@ -164,4 +165,37 @@ func learnDefer() (ok bool) {
 	// defer широко используется для закрытия файлов, чтобы закрывающая файл
 	// функция находилась близко к открывающей
 	return true
+}
+
+// Stringer объявление как интерфейса с одним методом, String
+type Stringer interface {
+	String() string
+}
+
+// объявление pair как структуры с двумя полями x и y типа int
+type pair struct {
+	x, y int
+}
+
+// объявление метода для типа pair; теперь pair реализует интерфейс Stringer
+func (p pair) String() string { // p в данном случае называют receiver-ом
+	// Sprintf - ещё одна функция из пакета fmt
+	// Обращение к полям p через точчку
+	return fmt.Sprintf("(%d, %d)", p.x, p.y)
+}
+
+func learnInterfaces() {
+	// синтаксис с фигурными скобками это "литерал структуры". Он возвращает
+	// проинициализированную структуру, а оператор := присваивает её p
+	p := pair{3, 4}
+	fmt.Println(p.String()) // вызов метода String у переменной p типа pair
+	var i Stringer          // объявление i как типа с интерфейсом Stringer
+	i = p                   // валидно, т.к. pair реализует Stringer
+	// Вызов метода String у i типа Stringer
+	fmt.Println(i.String())
+
+	// Функция в пакете fmt сами всегда вызывают метод String у объектов для
+	// получения их строкового представления
+	fmt.Println(p) // вывод такой-же, как и выше
+	fmt.Println(i) // вывод такой-же, как и выше
 }
