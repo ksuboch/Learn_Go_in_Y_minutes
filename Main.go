@@ -15,6 +15,7 @@ func main() {
 	// Println выводит строку в stdout
 	// Это функция из пакета fmt
 	fmt.Println("Hello world!")
+	beyondHello()
 }
 
 // Параметры функции указываются в круглых скобках
@@ -27,6 +28,7 @@ func beyondHello() {
 	y := 4
 	sum, prod := learnMultiple(x, y)        // Функция возвращает два значения
 	fmt.Println("sum:", sum, "prod:", prod) // Простой вывод
+	learnTypes()
 }
 
 // Функция, имеющая входные параметры и возвращающая несколько значений
@@ -139,4 +141,15 @@ func learnFlowControl() {
 	if y := expensiveComputation(); y > x {
 		x = y
 	}
+	// Функции являются замыканиями
+	xBig := func() bool {
+		return x > 10000 // Ссылается на x, объявленный выше switch
+	}
+	fmt.Println("xBig", xBig()) // true (т.к. мы присвоили x = e^10)
+	x = 1.3e3                   // тут x == 1300
+	fmt.Println("xBig", xBig()) // Теперь false
+
+	// метки
+	goto love
+love:
 }
