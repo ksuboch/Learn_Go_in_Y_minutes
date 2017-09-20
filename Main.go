@@ -5,8 +5,9 @@
 package main
 
 import (
-	"fmt"    // пакет в стандартной библиотеке Go
-	m "math" // импортировать math под локальным именем m
+	"fmt"     // пакет в стандартной библиотеке Go
+	m "math"  // импортировать math под локальным именем m
+	"strconv" // конвертирование типов в строки и обратно
 )
 
 // Объявление функции main. Это специальная функция,
@@ -211,4 +212,21 @@ func learnVariadicParams(myStrings ...interface{}) {
 
 	// передать все варьируемые параметры
 	fmt.Println("params:", fmt.Sprintln(myStrings...))
+
+	learnErrorHandling()
+}
+
+func learnErrorHandling() {
+	// идиома ", ok" служит для обозначения корректного срабатывания чего-либо
+	m := map[int]string{3: "three", 4: "four"}
+	if x, ok := m[1]; !ok { // ок будет false, потому что 1 нет в map-е
+		fmt.Println("тут ничего нет")
+	} else {
+		fmt.Println(x) // x содержал бы значение, если бы 1 был в map-e
+	}
+	// идиома ", err" служит для обозначения того, была ли ошибка или нет
+	if _, err := strconv.Atoi("non-int"); err != nil { // _ игнорирует значение
+		// выведет "strconv.ParseInt: parsing "non-int": invalid syntax"
+		fmt.Println(err)
+	}
 }
