@@ -5,9 +5,11 @@
 package main
 
 import (
-	"fmt"     // пакет в стандартной библиотеке Go
-	m "math"  // импортировать math под локальным именем m
-	"strconv" // конвертирование типов в строки и обратно
+	"fmt"       // пакет в стандартной библиотеке Go
+	"io/ioutil" // реализация функция ввода/вывода
+	m "math"    // импортировать math под локальным именем m
+	"net/http"  //веб сервер
+	"strconv"   // конвертирование типов в строки и обратно
 )
 
 // Объявление функции main. Это специальная функция,
@@ -229,4 +231,66 @@ func learnErrorHandling() {
 		// выведет "strconv.ParseInt: parsing "non-int": invalid syntax"
 		fmt.Println(err)
 	}
+
+	learnConcurrency()
+}
+
+func inc(i int, c chan int) {
+	c <- i + 1 // когда channel слева, <- является оператором "отправки"
+}
+
+// будем ипользовать функцию inc для конкурентной инкрементации чисел
+func learnConcurrency() {
+	// тот же make, что и в случае со slice. Он предназначен для выделения
+	// памяти и инициализации типов slice, map и channel
+	c := make(chan int)
+	// старт трех конкурентнов gorutine. Числа будут инкрементированы
+	// конкурентно и, может быть параллельно, если машинка
+	// правильно сконфигурирована и позволяет это делать. Все они будут отправлены в один
+	// и тот же канал
+	go inc(0, c) // Go начинает новую горутину
+	go inc(10, c)
+	go inc(-805, c)
+	// Считывание всех трёх результатов из канала и вывод на экран
+	// Нет никакой гарантии в каком порядке они будут выведены
+	fmt.Println(<-c, <-c, <-c) // канал справа, <- обозначает "получение"
+
+	cs := make(chan string)       // другой канал содержит строки
+	cc := make(chan chan string)  // канал каналов со строками
+	go func() { c <- 84 }()       // пуск новой горутины для отправки значения
+	go func() { cs <- "wordy" }() // ещё раз, теперь для cs
+	// select тоже что и switch, но работает с каналами. Он случайно выбирает
+	// готовый для взаимодействия канал
+	select {
+	case i := <-c: // получченное значение можно присвоить переменной
+		fmt.Printf("это %T", i)
+	case <-cs: // либо это значение можно игнорировать
+		fmt.Println("это строка")
+	case <-cc: // пустой канал, не готтов для коммуникации
+		fmt.Println("это не выполняется")
+	}
+	// В этой точке значение будет получено из c или cs. Одна горутина будет
+	// завершена, другая останется заблокированной
+	learnWebProgramming()
+}
+
+func learnWebProgramming() {
+	// у ListenAndServe первый параметр это TCP адрес, который нужно слушать
+	// второй параметр это интерфейс типа http.Handler
+	err := http.ListenAndServe(":8080", pair{})
+	fmt.Println(err) // не игнорируйте сообщения об ошибках
+}
+
+// Реализация интерфейса http.Handler для pair, только один метод ServerHTTP
+func (p pair) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Обработка запроса и отправка данных методом из http.ResponseWriter
+	w.Write([]byte("You learned Go in Y minutes!"))
+}
+
+func requestServer() {
+	resp, err := http.Get("http://localhost:8080")
+	fmt.Println(err)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Printf("\nWebserver said :`%s`", string(body))
 }
